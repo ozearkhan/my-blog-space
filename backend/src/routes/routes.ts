@@ -4,5 +4,4 @@ import { user } from '../domains/user'
 
 export const server = new Hono().basePath('api/v1')
 
-server.route('/blog',blog)
-server.route('/users',user)
+server.route('/blog',blog).route('/users',user)

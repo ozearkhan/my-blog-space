@@ -1,11 +1,8 @@
 import {Hono} from 'hono';
+import {signInHandler, storeUserHandler} from "./controller";
 export const user = new Hono();
 
-user.post('/signup',(c)=>{
-    return c.text('user/signup');
-})
+user.post('/signup',...storeUserHandler)
 
-user.post('/signin',(c)=>{
-    return c.text('user/signin');
-})
+user.post('/signin',...signInHandler)
 
