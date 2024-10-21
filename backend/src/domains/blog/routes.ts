@@ -1,18 +1,26 @@
-import { Hono } from 'hono'
-export const blog = new Hono()
+import { Hono } from 'hono';
+import {
+    jwtMiddleware,
+    getBlogsHandler,
+    getSingleBlogHandler,
+    createBlogHandler,
+    updateBlogHandler
+} from "./controller";
 
-blog.post('/', (c)=>{
-    return c.text('/blog/post')
-})
+export const blog = new Hono();
 
-blog.put('/',(c)=>{
-    return c.text('/blog/put')
-})
+// All routes require JWT authentication
+blog.use('/*', jwtMiddleware);
+// Blog post creation
+blog.post('/', ...createBlogHandler);
 
-// blog.get('/:id',(c) =>{
-//     return c.text('blog/get/:id')
-// })
+// Update an existing blog
+blog.put('/', ...updateBlogHandler);
 
-blog.get('/bulk',(c)=>{
-    return c.text('blog/bulk')
-})
+// Get all blog posts
+blog.get('/bulk', ...getBlogsHandler);
+
+// Get a single blog post by ID
+blog.get('/:id', ...getSingleBlogHandler);
+
+

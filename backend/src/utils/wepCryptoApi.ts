@@ -1,4 +1,5 @@
 
+
 // Utility to encode strings to ArrayBuffer
 function encodeToArrayBuffer(data: string): ArrayBuffer {
     return new TextEncoder().encode(data);
@@ -32,5 +33,10 @@ async function hashPassword(password: string, salt: ArrayBuffer): Promise<ArrayB
         256 // desired key length in bits
     );
 }
+
+
+
+
+
 
 export { encodeToArrayBuffer, generateSalt , hashPassword};

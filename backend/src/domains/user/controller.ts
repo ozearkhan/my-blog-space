@@ -1,7 +1,7 @@
 import { createFactory } from 'hono/factory';
 import {generateSalt, hashPassword} from "../../utils/wepCryptoApi";
 import {getPrisma} from "../../config/db";
-import { sign, verify } from 'hono/jwt'
+import { sign } from 'hono/jwt'
 
 const factory = createFactory()
 
@@ -33,7 +33,7 @@ const hashPasswordMiddleware = factory.createMiddleware(async(c,next)=>{
 })
 
 const storeUserHandler = factory.createHandlers(hashPasswordMiddleware,async(c)=>{
-    const body = c.get('body')
+    const body = await c.get('body')
     const prisma = getPrisma(c.env.DATABASE_URL)
 
     try {
@@ -46,7 +46,7 @@ const storeUserHandler = factory.createHandlers(hashPasswordMiddleware,async(c)=
         });
 
         const token = await sign({ id : user.id }, c.env.JWT_SECRET)
-        return c.json({ jwt: `Bearer ${token}`})
+        return c.json({ token: `Bearer ${token}`})
     } catch(e) {
         c.status(403)
         c.json({ error : "Error while signup in user/signup route"})
@@ -92,7 +92,7 @@ const signInHandler = factory.createHandlers(findUserMiddleware,async (c)=>{
     const user = c.get('user')
     // Passwords match, generate a token
     const token = await sign({ id: user.id }, c.env.JWT_SECRET);
-    return c.json({ jwt: `Bearer ${token}` });
+    return c.json({ token: `Bearer ${token}` });
 })
 
 
