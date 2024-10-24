@@ -2,6 +2,7 @@ import { createFactory } from 'hono/factory';
 import {generateSalt, hashPassword} from "../../utils/wepCryptoApi";
 import {getPrisma} from "../../config/db";
 import { sign } from 'hono/jwt'
+import { signupinput, signininput } from "@ozear1224/my-blog-space-common"
 
 const factory = createFactory()
 
@@ -33,7 +34,17 @@ const hashPasswordMiddleware = factory.createMiddleware(async(c,next)=>{
 })
 
 const storeUserHandler = factory.createHandlers(hashPasswordMiddleware,async(c)=>{
+
+
+
     const body = await c.get('body')
+    const {success } = signupinput.safeParse(body)
+    if(!success){
+        c.status(411)
+        return c.json({
+            Message: "Input validation failed"
+        })
+    }
     const prisma = getPrisma(c.env.DATABASE_URL)
 
     try {
@@ -57,6 +68,13 @@ const storeUserHandler = factory.createHandlers(hashPasswordMiddleware,async(c)=
 const findUserMiddleware = factory.createMiddleware(async (c, next) => {
     try {
         const body = await c.req.json();
+        const {success} = signininput.safeParse(body)
+        if(!success){
+            c.status(411)
+            return c.json({
+                message: "Input validation failed"
+            })
+        }
         const prisma = getPrisma(c.env.DATABASE_URL);
 
         const user = await prisma.user.findUnique({

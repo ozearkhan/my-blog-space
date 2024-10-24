@@ -1,6 +1,7 @@
 import {createFactory} from "hono/factory";
 import {getPrisma} from "../../config/db";
 import {verify} from "hono/jwt";
+import { createbloginput, updatebloginput } from "@ozear1224/my-blog-space-common"
 
 const factory = createFactory();
 
@@ -25,6 +26,12 @@ const jwtMiddleware = factory.createMiddleware(async (c, next) => {
 const createBlogMiddleware = factory.createMiddleware(async (c, next) => {
     const prisma = getPrisma(c.env.DATABASE_URL);
     const body = await c.req.json();
+    const { success } = createbloginput.safeParse(body)
+    if(!success){
+        c.status(401);
+        return c.json({ error: 'Input Validation failed' });
+    }
+
     const user = c.get('user');
 
     try {
@@ -47,6 +54,11 @@ const createBlogMiddleware = factory.createMiddleware(async (c, next) => {
 const updateBlogMiddleware = factory.createMiddleware(async (c, next) => {
     const prisma = getPrisma(c.env.DATABASE_URL);
     const body = await c.req.json();
+    const { success } = updatebloginput.safeParse(body)
+    if(!success){
+        c.status(401);
+        return c.json({ error: 'Input validation failed' });
+    }
 
     try {
         const blog = await prisma.post.update({
@@ -87,7 +99,7 @@ const getBlogMiddleware = factory.createMiddleware(async (c, next) => {
 });
 
 
-//tod0 : should add pagination do not need to return all blogs.
+//todo : should add pagination do not need to return all blogs.
 const getAllBlogMiddleware = factory.createMiddleware(async (c, next) => {
     const prisma = getPrisma(c.env.DATABASE_URL);
     const blogs = await prisma.post.findMany(); // Fetch all blog posts
