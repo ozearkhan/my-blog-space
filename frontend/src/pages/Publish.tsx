@@ -23,7 +23,8 @@ export const Publish = () => {
                 <button onClick={async () => {
                     const response = await axios.post(`${BACKEND_URL}/api/v1/blog`, {
                         title,
-                        content: description
+                        content: description,
+                        published: true
                     }, {
                         headers: {
                             Authorization: localStorage.getItem("token")
